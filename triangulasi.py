@@ -1,3 +1,9 @@
+"""
+Main module for sampling PIR system at some points, and calculate the victim position.
+Data will be uploaded to database.
+"""
+
+
 import subprocess
 import csv
 import datetime
