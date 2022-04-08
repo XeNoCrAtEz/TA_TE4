@@ -96,6 +96,7 @@ class PIR: # TODO: update docstrings
                 
                 with self.PIRlock:
                     self.detectionResult = normalize_data(detectionFreq)
+                    self.m = np.transpose(np.array(self.detectionResult, dtype=bool))
                     self.s = np.dot(np.linalg.inv(self.V), self.m).astype(bool)
 
                 # reset detection results
@@ -111,12 +112,6 @@ class PIR: # TODO: update docstrings
         with self.PIRlock:
             return self.detectionResult
 
-    def calc_output_pattern(self) -> np.ndarray:
-        """
-        returns the latest output pattern m (as a numpy array)
-        """
-
-        return np.transpose(np.array(self.get_detection_result(), dtype=bool))
     
     def get_output_pattern(self) -> np.ndarray:
         """
