@@ -62,8 +62,8 @@ class PIR: # TODO: update docstrings
         self.deltaTheta = 360/len(pin_PIR) if deltaTheta is None else deltaTheta
         self.detectionResult = [0 for _ in pin_PIR]
         self.V = V if V is not None else np.identity(len(pin_PIR))
-        self.m = self.get_output_pattern()
-        self.s = self.get_detection_pattern()
+        self.m = np.array([])
+        self.s = np.array([])
 
         self.updateTime = updateTime
         self.samplingFreq = samplingFreq
