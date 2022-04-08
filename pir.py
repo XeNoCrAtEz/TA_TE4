@@ -34,7 +34,7 @@ class PIR:
         main program is terminated. No need to call it explicitly as it is automatically
         called by the Thread object at __init__
     get_detection_result() -> list
-        returns the "detectionResult" of the PIRs
+        returns the latest "detectionResult" of the PIRs
     """
 
     def __init__(self, pin_PIR:list, updateTime:float = 1, samplingFreq:float = 10) -> None:
