@@ -1,3 +1,8 @@
+"""
+Run this module to sample PIR sensors at a point for a given time (in seconds)
+"""
+
+
 from time import time, sleep, ctime
 import csv
 import numpy as np
