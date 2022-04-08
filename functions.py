@@ -149,37 +149,7 @@ def globalXYTolatlng(x:float, y:float) -> list:
     rad_lng = x / earthRadius / np.cos(rad_lat)
     return [rad_lat, rad_lng]
 
-def calc_AoA(s, deltaTheta:float) -> float:
-    """
-    Calculate AoA (in degree) for the given detection pattern s and fan-shaped cell
-    detection angle (in degree)
-    
-    Parameters
-    ----------
-    s : numpy.array()
-        detection pattern
-    deltaTheta : float
-        fan-shaped cell detection angle (in degree)
-    
-    Returns
-    -------
-    float
-        AoA value of the given detection pattern
-    None
-        If the given detection pattern does not match any AoA value
-    """
 
-    sparsity = np.count_nonzero(s)
-    the_list = np.transpose(s).tolist()
-    if sparsity > 2: return None
-    elif sparsity == 2:
-        for i in range(len(the_list)):
-            if [s[i-1], s[i]] == [True, True]:
-                return ((i-1 % len(the_list)) + (i + 1)) * deltaTheta / 2
-    elif sparsity == 1:
-        i = the_list.index(True)
-        return (i + i + 1) * deltaTheta / 2
-    else: return None
 
 def calc_victim_pos(posList:list, AoAList:list) -> list:
     """

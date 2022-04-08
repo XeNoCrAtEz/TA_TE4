@@ -39,12 +39,13 @@ class PIR: # TODO: update docstrings
     """
 
     def __init__(
-            self, pin_PIR:list, V: np.ndarray() = None,
+            self, pin_PIR:list,
+            deltaTheta:float = None, V: np.ndarray() = None,
             updateTime:float = 1, samplingFreq:float = 10
     ) -> None:
         """
         Parameters
-        ----------
+        ----------      # TODO: update docstrings to include deltaTheta
         pin_PIR : list[int]
             List of GPIO pin number (in BCM) where PIR0..n is connected
         V : np.ndarray()
@@ -58,6 +59,7 @@ class PIR: # TODO: update docstrings
 
         self.pin_PIR = pin_PIR
 
+        self.deltaTheta = 360/len(pin_PIR) if deltaTheta is None else deltaTheta
         self.detectionResult = [0 for _ in pin_PIR]
         self.V = V if V is not None else np.identity(len(pin_PIR))
         self.m = self.get_output_pattern()
@@ -129,3 +131,35 @@ class PIR: # TODO: update docstrings
         
         with self.PIRlock:
             return self.s
+
+    def calc_AoA(self) -> float:
+        """
+        Calculate AoA (in degree) for the given detection pattern s and fan-shaped cell
+        detection angle (in degree)
+
+        Parameters
+        ----------
+        s : numpy.array()
+            detection pattern
+        deltaTheta : float
+            fan-shaped cell detection angle (in degree)
+
+        Returns
+        -------
+        float
+            AoA value of the given detection pattern
+        None
+            If the given detection pattern does not match any AoA value
+        """
+
+        sparsity = np.count_nonzero(s)
+        the_list = np.transpose(s).tolist()
+        if sparsity > 2: return None
+        elif sparsity == 2:
+            for i in range(len(the_list)):
+                if [s[i-1], s[i]] == [True, True]:
+                    return ((i-1 % len(the_list)) + (i + 1)) * deltaTheta / 2
+        elif sparsity == 1:
+            i = the_list.index(True)
+            return (i + i + 1) * deltaTheta / 2
+        else: return None
