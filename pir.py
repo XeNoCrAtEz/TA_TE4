@@ -60,7 +60,7 @@ class PIR:
 
         self.detectionResult = [0 for _ in pin_PIR]
         self.V = V if V is not None else np.identity(len(pin_PIR))
-        self.m = np.transpose(np.array(self.detectionResult, dtype=bool))
+        self.m = self.get_output_pattern()
 
         self.updateTime = updateTime
         self.samplingFreq = samplingFreq
@@ -108,3 +108,10 @@ class PIR:
         
         with self.PIRlock:
             return self.detectionResult
+
+    def get_output_pattern(self) -> np.ndarray:
+        """
+        returns the latest output pattern (as a numpy array)
+        """
+
+        return np.transpose(np.array(self.get_detection_result(), dtype=bool))
