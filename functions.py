@@ -149,7 +149,7 @@ def globalXYTolatlng(x:float, y:float) -> list:
     rad_lng = x / earthRadius / np.cos(rad_lat)
     return [rad_lat, rad_lng]
 
-def calc_detection_pattern(V, m):
+def calc_detection_pattern(V, m) -> np.ndarray():
     """
     Calculate detection pattern s of the PIR system (s = m * V)
     
