@@ -60,8 +60,8 @@ class PIR: # TODO: update docstrings
         self.pin_PIR = pin_PIR
 
         self.deltaTheta = 360/len(pin_PIR) if deltaTheta is None else deltaTheta
+        self.V = np.identity(len(pin_PIR)) if V is None else V
         self.detectionResult = [0 for _ in pin_PIR]
-        self.V = V if V is not None else np.identity(len(pin_PIR))
         self.m = np.array([])
         self.s = np.array([])
 
