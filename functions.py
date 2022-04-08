@@ -149,30 +149,6 @@ def globalXYTolatlng(x:float, y:float) -> list:
     rad_lng = x / earthRadius / np.cos(rad_lat)
     return [rad_lat, rad_lng]
 
-def calc_detection_pattern(V, m) -> np.ndarray():
-    """
-    Calculate detection pattern s of the PIR system (s = m * V)
-    
-    Parameters
-    ----------
-    V : numpy.array()
-        visibility matrix
-    m : numpy.array()
-        output pattern of the PIR system
-    
-    Returns
-    -------
-    numpy.array()
-        detection pattern s
-
-    Raises
-    ------
-    ValueError
-        Dimension mismatch, if V and m not compatible with each other
-    """
-    
-    return np.dot(np.linalg.inv(V), m).astype(bool)
-
 def calc_AoA(s, deltaTheta:float) -> float:
     """
     Calculate AoA (in degree) for the given detection pattern s and fan-shaped cell
