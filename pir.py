@@ -110,6 +110,13 @@ class PIR: # TODO: update docstrings
         with self.PIRlock:
             return self.detectionResult
 
+    def calc_output_pattern(self) -> np.ndarray:
+        """
+        returns the latest output pattern m (as a numpy array)
+        """
+
+        return np.transpose(np.array(self.get_detection_result(), dtype=bool))
+    
     def get_output_pattern(self) -> np.ndarray:
         """
         returns the latest output pattern m (as a numpy array)
@@ -117,7 +124,6 @@ class PIR: # TODO: update docstrings
 
         with self.PIRlock:
             return self.m
-        return np.transpose(np.array(self.get_detection_result(), dtype=bool))
 
     def get_detection_pattern(self) -> np.ndarray:
         """
