@@ -96,6 +96,7 @@ class PIR: # TODO: update docstrings
                 
                 with self.PIRlock:
                     self.detectionResult = normalize_data(detectionFreq)
+                    self.s = np.dot(np.linalg.inv(self.V), self.m).astype(bool)
 
                 # reset detection results
                 detectionFreq = [0 for _ in self.pin_PIR]
@@ -133,19 +134,3 @@ class PIR: # TODO: update docstrings
         
         with self.PIRlock:
             return self.s
-
-    def calc_detection_pattern(self) -> np.ndarray:
-        """
-        Calculate detection pattern s based on the latest output pattern
-
-        Returns
-        -------
-        numpy.array()
-            detection pattern s
-
-        Raises
-        ------
-        ValueError
-            Dimension mismatch, if V and m not compatible with each other
-        """
-        return np.dot(np.linalg.inv(self.V), self.ge).astype(bool)
