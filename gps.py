@@ -3,8 +3,46 @@ import threading
 import pynmea2
 
 class GPS:
-    def __init__(self) -> None:
-        self.port = "/dev/serial0"
+    """
+    A class that represents the GPS system. When instanced, it creates a new thread
+    that runs continuously on the background, taking latitude and longitude data from
+    the GPS.
+
+    Attributes
+    ----------
+    port : str
+        Specifies the path to Serial port filestream
+    ser : serial.Serial()
+        Serial object for communicating with the GPS
+        (default baudrate is 9600, default timeout is 0.5)
+    lat, lng : float, float
+        The received latitude and longitude data
+    GPSlock = threading.Lock()
+        A lock to prevent race condition when read/writing "lat, lng"
+    GPSSamplingThread = threading.Thread()
+        A Thread object for receiving GPS data and update "lat, lng" continuously
+        on the background
+
+    Methods
+    -------
+    sample_GPS() -> None
+        Receive GPS data and update "lat, lng" continuously forever until
+        main program is terminated. No need to call it explicitly as it is automatically
+        called by the Thread object at __init__
+    get_lat_lng() -> list
+        returns the latest "lat, lng" received from the GPS
+    """
+
+    def __init__(self, port="/dev/serial0") -> None:
+        """
+        Parameters
+        ----------
+        port : str
+            Specifies the path to Serial port filestream
+            (default is Serial0 => "/dev/serial0")
+        """
+
+        self.port = port
         self.ser = serial.Serial(self.port, baudrate=9600, timeout=0.5)
 
         self.lat, self.lng = 0, 0
@@ -14,6 +52,10 @@ class GPS:
         self.GPSSamplingThread.start()
 
     def sample_GPS(self) -> None:
+        """
+        Get the GPS latitude and longitude data and update the result.
+        """
+
         while True:
             # get readline until "$GNRMC"
             newdata = str(self.ser.readline(), errors='ignore')
@@ -25,5 +67,9 @@ class GPS:
                 self.lat, self.lng = newmsg.latitude, newmsg.longitude
 
     def get_lat_lng(self) -> list:
+        """
+        Returns the latest latitude longitude value.
+        """
+
         with self.GPSlock:
             return [self.lat, self.lng]

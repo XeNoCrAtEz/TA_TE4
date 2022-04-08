@@ -94,5 +94,6 @@ class PIR:
         """
         Returns the latest detection result.
         """
+        
         with self.PIRlock:
             return self.detectionResult
