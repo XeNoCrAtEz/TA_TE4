@@ -6,7 +6,7 @@ import numpy as np
 
 GPIO.setmode(GPIO.BCM)
 
-class PIR:
+class PIR: # TODO: update docstrings
     """
     A class that represents the PIR system. When instanced, it creates a new thread
     that runs continuously on the background, sampling all the PIR sensor, and updates
@@ -61,6 +61,7 @@ class PIR:
         self.detectionResult = [0 for _ in pin_PIR]
         self.V = V if V is not None else np.identity(len(pin_PIR))
         self.m = self.get_output_pattern()
+        self.s = self.get_detection_pattern()
 
         self.updateTime = updateTime
         self.samplingFreq = samplingFreq
@@ -111,7 +112,31 @@ class PIR:
 
     def get_output_pattern(self) -> np.ndarray:
         """
-        returns the latest output pattern (as a numpy array)
+        returns the latest output pattern m (as a numpy array)
         """
 
         return np.transpose(np.array(self.get_detection_result(), dtype=bool))
+
+    def get_detection_pattern(self) -> np.ndarray:
+        """
+        get detection pattern s of the PIR system (s = m * V)
+
+        Parameters
+        ----------
+        V : numpy.array()
+            visibility matrix
+        m : numpy.array()
+            output pattern of the PIR system
+
+        Returns
+        -------
+        numpy.array()
+            detection pattern s
+
+        Raises
+        ------
+        ValueError
+            Dimension mismatch, if V and m not compatible with each other
+        """
+
+        return np.dot(np.linalg.inv(V), m).astype(bool)
