@@ -10,6 +10,13 @@ When running this module, it needs two command line arguments:
         (in seconds)
     * third argument:
         Specifies how long the system will sample a point (in seconds)
+
+NOTE
+----
+if no GPS, use these command:
+sudo systemctl restart serial-getty@ttyAMA0.service
+sudo systemctl stop serial-getty@ttyAMA0.service
+sudo systemctl disable serial-getty@ttyAMA0.service
 """
 
 from time import time, sleep, ctime
@@ -80,9 +87,3 @@ while True:
 
     if time() > samplingTime:
         break
-
-# NOTE:
-# if no GPS, use these command:
-# sudo systemctl restart serial-getty@ttyAMA0.service
-# sudo systemctl stop serial-getty@ttyAMA0.service
-# sudo systemctl disable serial-getty@ttyAMA0.service
