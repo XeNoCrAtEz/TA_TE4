@@ -2,6 +2,7 @@ import RPi.GPIO as GPIO
 import threading
 from time import time, sleep
 from functions import normalize_data
+import numpy as np
 
 GPIO.setmode(GPIO.BCM)
 
@@ -37,12 +38,18 @@ class PIR:
         returns the latest "detectionResult" of the PIRs
     """
 
-    def __init__(self, pin_PIR:list, updateTime:float = 1, samplingFreq:float = 10) -> None:
+    def __init__(
+            self, pin_PIR:list, V: np.ndarray() = None,
+            updateTime:float = 1, samplingFreq:float = 10
+    ) -> None:
         """
         Parameters
         ----------
         pin_PIR : list[int]
             List of GPIO pin number (in BCM) where PIR0..n is connected
+        V : np.ndarray()
+            PIR visibility matrix (default is None, which means the visibility matrix
+            is an identity matrix)
         updateTime : float, optional
             Specifies when to update "detectionResult" in seconds (default is 1)
         samplingFreq : int, optional
@@ -50,7 +57,11 @@ class PIR:
         """
 
         self.pin_PIR = pin_PIR
+
         self.detectionResult = [0 for _ in pin_PIR]
+        self.V = V if V is not None else np.identity(len(pin_PIR))
+        self.m = np.transpose(np.array(self.detectionResult, dtype=bool))
+
         self.updateTime = updateTime
         self.samplingFreq = samplingFreq
         self.PIRlock = threading.Lock()
