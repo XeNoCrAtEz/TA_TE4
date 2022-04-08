@@ -129,12 +129,14 @@ class PIR: # TODO: update docstrings
         """
         returns detection pattern s of the PIR system (s = m * V)
 
-        Parameters
-        ----------
-        V : numpy.array()
-            visibility matrix
-        m : numpy.array()
-            output pattern of the PIR system
+        """
+        
+        with self.PIRlock:
+            return self.s
+
+    def calc_detection_pattern(self) -> np.ndarray:
+        """
+        Calculate detection pattern s based on the latest output pattern
 
         Returns
         -------
@@ -146,6 +148,4 @@ class PIR: # TODO: update docstrings
         ValueError
             Dimension mismatch, if V and m not compatible with each other
         """
-        with self.PIRlock:
-            return self.s
-        return np.dot(np.linalg.inv(self.V), self.m).astype(bool)
+        return np.dot(np.linalg.inv(self.V), self.ge).astype(bool)
