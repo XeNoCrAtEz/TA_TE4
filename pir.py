@@ -127,7 +127,7 @@ class PIR: # TODO: update docstrings
 
     def get_detection_pattern(self) -> np.ndarray:
         """
-        get detection pattern s of the PIR system (s = m * V)
+        returns detection pattern s of the PIR system (s = m * V)
 
         Parameters
         ----------
@@ -146,5 +146,6 @@ class PIR: # TODO: update docstrings
         ValueError
             Dimension mismatch, if V and m not compatible with each other
         """
-
-        return np.dot(np.linalg.inv(V), m).astype(bool)
+        with self.PIRlock:
+            return self.s
+        return np.dot(np.linalg.inv(self.V), self.m).astype(bool)
