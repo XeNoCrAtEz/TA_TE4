@@ -115,6 +115,8 @@ class PIR: # TODO: update docstrings
         returns the latest output pattern m (as a numpy array)
         """
 
+        with self.PIRlock:
+            return self.m
         return np.transpose(np.array(self.get_detection_result(), dtype=bool))
 
     def get_detection_pattern(self) -> np.ndarray:
