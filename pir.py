@@ -8,7 +8,7 @@ GPIO.setmode(GPIO.BCM)
 
 class PIR: # TODO: update docstrings
     """
-    A class that represents the PIR system. When instanced, it creates a new thread
+    A class that represents general PIR system. When instanced, it creates a new thread
     that runs continuously on the background, sampling all the PIR sensor, and updates
     the output periodically.
 
@@ -39,28 +39,35 @@ class PIR: # TODO: update docstrings
     """
 
     def __init__(
-            self, pin_PIR:list,
-            deltaTheta:float = None, V: np.ndarray() = None,
+            self, pin_PIR:list, n:int, FOV:float,
             updateTime:float = 1, samplingFreq:float = 10
     ) -> None:
         """
         Parameters
         ----------      # TODO: update docstrings to include deltaTheta
         pin_PIR : list[int]
-            List of GPIO pin number (in BCM) where PIR0..n is connected
-        V : np.ndarray()
-            PIR visibility matrix (default is None, which means the visibility matrix
-            is an identity matrix)
+            List of GPIO pin number (in BCM) where PIR0..k is connected
+        n : int
+            Number of fan-shaped detection cells on this PIR system
+        FOV : float
+            PIR system Field-of-View
         updateTime : float, optional
             Specifies when to update "detectionResult" in seconds (default is 1)
         samplingFreq : int, optional
             Specifies sampling frequency of PIRs in Hz (default is 10)
         """
 
+        # PIR system attributes
         self.pin_PIR = pin_PIR
+        self.k = len(pin_PIR)
 
-        self.deltaTheta = 360/len(pin_PIR) if deltaTheta is None else deltaTheta
-        self.V = np.identity(len(pin_PIR)) if V is None else V
+        self.FOV = FOV
+        self.n = n
+        self.deltaTheta = FOV/n
+
+        self.V = self.calc_V()
+
+        # PIR system result attributes
         self.detectionResult = [0 for _ in pin_PIR]
         self.m = np.array([])
         self.s = np.array([])
