@@ -182,9 +182,11 @@ class PIR:
         startAngle = (180 - self.FOV)/2
         if sparsity == 1:
             i = s.index(True)
-            return (i + i + 1) * self.deltaTheta / 2 + startAngle
+            if self.FOV != 360: return (i + i + 1) * self.deltaTheta / 2 + startAngle
+            else: return (i + i + 1) * self.deltaTheta / 2
         elif sparsity == 2:
             for i in range(n):
                 if [s[i-1], s[i]] == [True, True]:
-                    return ((i-1 % n) + (i + 1)) * self.deltaTheta / 2 + startAngle
+                    if self.FOV != 360: return ((i-1 % n) + (i + 1)) * self.deltaTheta / 2 + startAngle
+                    else: return ((i-1 % n) + (i + 1)) * self.deltaTheta / 2
         else: return None
