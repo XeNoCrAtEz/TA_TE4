@@ -6,7 +6,7 @@ import numpy as np
 
 GPIO.setmode(GPIO.BCM)
 
-class PIR: # TODO: update docstrings
+class PIR:
     """
     A class that represents general PIR system. When instanced, it creates a new thread
     that runs continuously on the background, sampling all the PIR sensor, and updates
