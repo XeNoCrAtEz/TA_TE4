@@ -168,6 +168,10 @@ class PIR:
         Calculate AoA (in degree) for the given detection pattern s and fan-shaped cell
         detection angle (in degree)
 
+        NOTE
+        -------
+        FOV of 360 has different cell numbering than <360. For 360, C1 starts from 0 deg
+
         Returns
         -------
         float
