@@ -1,7 +1,7 @@
 """
 Run this module to sample PIR sensors at a point for a given time (in seconds).
 
-When running this module, it needs two command line arguments:
+When running this module, it needs three command line arguments:
     * first argument:
         specifies sampling point number. The resulting csv file will be named based
         on this argument
