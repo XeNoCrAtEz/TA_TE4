@@ -39,8 +39,8 @@ class PIR: # TODO: update docstrings
     """
 
     def __init__(
-            self, pin_PIR:list, n:int, FOV:float,
-            updateTime:float = 1, samplingFreq:float = 10
+            self, pin_PIR: list, n: int, FOV: float,
+            updateTime: float = 1, samplingFreq: float = 10
     ) -> None:
         """
         Parameters
@@ -112,6 +112,15 @@ class PIR: # TODO: update docstrings
                 detectionFreq = [0 for _ in self.pin_PIR]
                 numSamples = 0
                 endTime = time() + self.updateTime
+        
+    def calc_V(self) -> np.ndarray:
+        """
+        Returns the appropriate visibility matrix for the specified number of
+        fan-shaped detection cells and PIR count. Currently only supports calculating
+        for same number of fan-shaped cells and PIR count.
+        """
+        if self.k == self.n: return np.identity(self.k)
+        else: raise NotImplementedError
 
     def get_detection_result(self) -> list:
         """
