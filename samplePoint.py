@@ -40,7 +40,7 @@ pin_PIR = (2, 3, 4, 17, 27, 22, 10, 24, 23, 18)
 # delta theta for calculating AoA
 deltaTheta = 360 / len(pin_PIR)
 # PIR system object
-PIRsys = PIR(pin_PIR, updateTime, 100)
+PIRsys = PIR(pin_PIR, 10, 360, updateTime)
 
 # GPS system object
 GPSsys = GPS()
