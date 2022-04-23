@@ -44,7 +44,7 @@ class PIR: # TODO: update docstrings
     ) -> None:
         """
         Parameters
-        ----------      # TODO: update docstrings to include deltaTheta
+        ----------
         pin_PIR : list[int]
             List of GPIO pin number (in BCM) where PIR0..k is connected
         n : int
