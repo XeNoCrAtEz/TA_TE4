@@ -30,9 +30,9 @@ import sys
 
 
 # argument parsing
-pointNum = sys.argv[1]
-updateTime = sys.argv[2]
-samplingTimeout = sys.argv[3]
+pointNum = int(sys.argv[1])
+updateTime = int(sys.argv[2])
+samplingTimeout = int(sys.argv[3])
 
 # PIR pin settings
 #      PIR 1  2  3  4   5   6   7   8   9   10
