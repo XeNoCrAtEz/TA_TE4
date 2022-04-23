@@ -42,7 +42,6 @@ deltaTheta = 360 / len(pin_PIR)
 # PIR system object
 PIRsys = PIR(pin_PIR, updateTime, 100)
 
-
 # GPS system object
 GPSsys = GPS()
 
@@ -52,14 +51,8 @@ samplingTime = time() + samplingTimeout     # sample this point for 60 seconds
 while True:
     # get data
     detectionResult = PIRsys.get_detection_result()
+    AoA = PIRsys.calc_AoA()
     lat, lng = GPSsys.get_lat_lng()
-
-    # calculate output pattern m, detection pattern s, and AoA
-    m = np.transpose(np.array(detectionResult, dtype=bool))
-
-    s = calc_detection_pattern(V, m)
-
-    AoA = calc_AoA(s, deltaTheta)
 
     resultStr = '{}   lat: {:.12f} lng: {:.12f}   AoA: {}'.format(detectionResult, lat, lng, AoA)
     print(resultStr, end='\r')
