@@ -16,8 +16,22 @@ class PIR: # TODO: update docstrings
     ----------
     pin_PIR : list[int]
         List of GPIO pin number (in BCM) where the PIR0..n are connected
+    k : int
+        Number of PIR sensor
+    FOV : float
+        Bearing sensor's Field-of-View
+    n : int
+        Number of fan-shaped detection cells on this PIR system
+    deltaTheta : float
+        Angle size of each fan-shaped cells
+    V : np.ndarray
+        Bearing sensor's Visibility matrix
     detectionResult : list[bool]
-        Output pattern of the PIR
+        Output pattern of the PIRs (as python's list object)
+    m : np.ndarray
+        Output pattern of the PIRs (as numpy array)
+    s : np.ndarray
+        Detection pattern of the bearing sensor
     updateTime : float
         PIR system will update its "detectionResult" every "updateTime" seconds
     samplingFreq : float
