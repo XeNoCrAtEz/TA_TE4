@@ -93,7 +93,7 @@ class PIR: # TODO: update docstrings
         numSamples = 0
         samplingFreq = self.samplingFreq   # Hz
         samplingPeriod = 1/samplingFreq
-        endTime = time() + self.updateTime
+        updateEndTime = time() + self.updateTime
         while True:
             sampledResult = [GPIO.input(pinNum) for pinNum in self.pin_PIR]
             numSamples += 1
@@ -101,7 +101,7 @@ class PIR: # TODO: update docstrings
                 detectionFreq[idx] += result
             sleep(samplingPeriod)
             
-            if time() > endTime:
+            if time() > updateEndTime:
                 
                 with self.PIRlock:
                     self.detectionResult = normalize_data(detectionFreq)
@@ -111,7 +111,7 @@ class PIR: # TODO: update docstrings
                 # reset detection results
                 detectionFreq = [0 for _ in self.pin_PIR]
                 numSamples = 0
-                endTime = time() + self.updateTime
+                updateEndTime = time() + self.updateTime
         
     def calc_V(self) -> np.ndarray:
         """
