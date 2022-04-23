@@ -119,6 +119,7 @@ class PIR: # TODO: update docstrings
         fan-shaped detection cells and PIR count. Currently only supports calculating
         for same number of fan-shaped cells and PIR count.
         """
+
         if self.k == self.n: return np.identity(self.k)
         else: raise NotImplementedError
 
@@ -161,15 +162,15 @@ class PIR: # TODO: update docstrings
             If the given detection pattern does not match any AoA value
         """
 
-        s = self.get_detection_pattern()
+        s = np.transpose(self.get_detection_pattern()).tolist()
+        n = len(s)
         sparsity = np.count_nonzero(s)
-        the_list = np.transpose(s).tolist()
-        if sparsity > 2: return None
+        startAngle = (180 - self.FOV)/2
+        if sparsity == 1:
+            i = s.index(True)
+            return (i + i + 1) * self.deltaTheta / 2 + startAngle
         elif sparsity == 2:
-            for i in range(len(the_list)):
+            for i in range(n):
                 if [s[i-1], s[i]] == [True, True]:
-                    return ((i-1 % len(the_list)) + (i + 1)) * self.deltaTheta / 2
-        elif sparsity == 1:
-            i = the_list.index(True)
-            return (i + i + 1) * self.deltaTheta / 2
+                    return ((i-1 % n) + (i + 1)) * self.deltaTheta / 2 + startAngle
         else: return None
