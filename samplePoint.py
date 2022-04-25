@@ -56,27 +56,26 @@ else: raise RuntimeError("GPS sampling thread failed to run!")
 
 csvUpdateTime = time() + updateTime
 samplingTime = time() + samplingTimeout     # sample this point for 60 seconds
-# mainloop
-print("\nCollecting data...")
-while True:
-    # get data
-    detectionResult = PIRsys.get_detection_result()
-    AoA = PIRsys.calc_AoA()
-    lat, lng = GPSsys.get_lat_lng()
+csvFilename = 'detection_results/' + 'result' + str(pointNum) + '.csv'
+with open(csvFilename, mode='w') as resultFile:
+    CSVWriter = csv.writer(resultFile, delimiter='\t', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+    print("\nCollecting data...")
+    # mainloop
+    while True:
+        # get data
+        detectionResult = PIRsys.get_detection_result()
+        AoA = PIRsys.calc_AoA()
+        lat, lng = GPSsys.get_lat_lng()
 
-    resultStr = '{}     AoA: {}\n'.format(detectionResult, AoA)
-    resultStr += 'lat: {:.12f} lng: {:.12f}'.format(lat, lng)
-    print(resultStr, end='\r\033[F')        # for re-printing resultStr at the same place
+        resultStr = '{}     AoA: {}\n'.format(detectionResult, AoA)
+        resultStr += 'lat: {:.12f} lng: {:.12f}'.format(lat, lng)
+        print(resultStr, end='\r\033[F')        # for re-printing resultStr at the same place
 
-    # write to csv file if something detected, update per second
-    if time() > csvUpdateTime:
-        if AoA is not None:
-            csvFilename = 'detection_results/' + 'result' + str(pointNum) + '.csv'
-            with open(csvFilename, mode='w') as resultFile:
-                CSVWriter = csv.writer(resultFile, delimiter='\t', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-                CSVWriter.writerow([ctime(time()), detectionResult, lat, lng, AoA])
-        csvUpdateTime = time() + 1
+        # write to csv file if something detected, update per second
+        if time() > csvUpdateTime:
+            if AoA is not None: CSVWriter.writerow([ctime(time()), detectionResult, lat, lng, AoA])
+            csvUpdateTime = time() + 1
 
-    if time() > samplingTime:
-        print("\n\n\n\u001b[32mData collection Done!\u001b[0m\n")
-        break
+        if time() > samplingTime:
+            print("\n\n\n\u001b[32mData collection Done!\u001b[0m\n")
+            break
