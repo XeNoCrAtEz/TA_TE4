@@ -7,8 +7,6 @@ This module contains helper functions for the main python script:
     * to_deg - convert radian to degree
     * latlngToGlobalXY - convert latitude, longitude to global cartesian coordinate
     * globalXYTolatlng - convert global cartesian coordinate to latitude, longitude
-    * calc_detection_pattern - calculate detection pattern s (s = m * V)
-    * calc_AoA - calculate AoA based on detection pattern s
     * calc_victim_pos - calculate the position of victim using triangulation
     * normalize_data - normalize data using min-max normalization
 """
