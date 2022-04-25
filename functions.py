@@ -44,6 +44,7 @@ def to_screen_coord(
         screenSize[1]/2 - zoom*cartPoint[1]
     )
 
+
 def to_cart_coord(
         screenPoint: tuple,
         screenSize: tuple = [600,600], zoom: int = 1
@@ -73,6 +74,7 @@ def to_cart_coord(
         screenSize[1]/2 - zoom*screenPoint[1]
     )
 
+
 def to_rad(deg: float) -> float:
     """
     Converts degree value into radian
@@ -90,6 +92,7 @@ def to_rad(deg: float) -> float:
 
     return deg * np.pi / 180
 
+
 def to_deg(rad: float) -> float:
     """
     Converts radian value into degree
@@ -106,6 +109,7 @@ def to_deg(rad: float) -> float:
     """
 
     return rad * 180 / np.pi
+
 
 def latlngToGlobalXY(lat:float, lng:float) -> list:
     """
@@ -129,6 +133,7 @@ def latlngToGlobalXY(lat:float, lng:float) -> list:
     y = earthRadius * rad_lat
     return [x, y]
 
+
 def globalXYTolatlng(x:float, y:float) -> list:
     """
     Converts global cartesian coordinate value into latitude and longitude
@@ -148,7 +153,6 @@ def globalXYTolatlng(x:float, y:float) -> list:
     rad_lat = y / earthRadius
     rad_lng = x / earthRadius / np.cos(rad_lat)
     return [rad_lat, rad_lng]
-
 
 
 def calc_victim_pos(posList:list, AoAList:list) -> list:
@@ -200,6 +204,7 @@ def calc_victim_pos(posList:list, AoAList:list) -> list:
     targetPos = np.transpose(np.linalg.inv(np.transpose(A).dot(A)).dot(np.transpose(A)).dot(b) ).tolist()[0]
 
     return globalXYTolatlng(targetPos[0], targetPos[1])
+
 
 def normalize_data(data: list) -> list:
     """
