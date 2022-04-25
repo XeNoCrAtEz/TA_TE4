@@ -33,6 +33,8 @@ pointNum = int(sys.argv[1])
 updateTime = int(sys.argv[2])
 samplingTimeout = int(sys.argv[3])
 
+print("Initialize PIR system...", end="")
+
 # PIR pin settings
 #      PIR 1  2  3  4   5   6   7   8   9   10
 pin_PIR = (2, 3, 4, 17, 27, 22, 10, 24, 23, 18)
@@ -41,20 +43,30 @@ deltaTheta = 360 / len(pin_PIR)
 # PIR system object
 PIRsys = PIR(pin_PIR, 10, 360, updateTime)
 
+if PIRsys.PIRSamplingThread.is_alive(): print("\u001b[32mSuccess\u001b[0m")
+else: raise RuntimeError("PIR sampling thread failed to run!")
+
+print("Initialize GPS system...", end="")
+
 # GPS system object
 GPSsys = GPS()
+
+if GPSsys.GPSSamplingThread.is_alive(): print("\u001b[32mSuccess\u001b[0m")
+else: raise RuntimeError("GPS sampling thread failed to run!")
 
 csvUpdateTime = time() + updateTime
 samplingTime = time() + samplingTimeout     # sample this point for 60 seconds
 # mainloop
+print("\nCollecting data...")
 while True:
     # get data
     detectionResult = PIRsys.get_detection_result()
     AoA = PIRsys.calc_AoA()
     lat, lng = GPSsys.get_lat_lng()
 
-    resultStr = '{}   lat: {:.12f} lng: {:.12f}   AoA: {}'.format(detectionResult, lat, lng, AoA)
-    print(resultStr, end='\r')
+    resultStr = '{}     AoA: {}\n'.format(detectionResult, AoA)
+    resultStr += 'lat: {:.12f} lng: {:.12f}'.format(lat, lng)
+    print(resultStr, end='\r\033[F')        # for re-printing resultStr at the same place
 
     # write to csv file if something detected, update per second
     if time() > csvUpdateTime:
@@ -66,4 +78,5 @@ while True:
         csvUpdateTime = time() + 1
 
     if time() > samplingTime:
+        print("\n\n\n\u001b[32mData collection Done!\u001b[0m\n")
         break
