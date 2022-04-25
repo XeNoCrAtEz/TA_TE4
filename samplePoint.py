@@ -19,9 +19,8 @@ sudo systemctl stop serial-getty@ttyAMA0.service
 sudo systemctl disable serial-getty@ttyAMA0.service
 """
 
-from time import time, sleep, ctime
+from time import time, ctime
 import csv
-import numpy as np
 from pir import *
 from gps import *
 from myObjects import *
