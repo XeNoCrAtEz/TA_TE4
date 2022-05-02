@@ -61,6 +61,7 @@ csvFilename = 'detection_results/' + 'result' + str(pointNum) + '.csv'
 with open(csvFilename, mode='w') as resultFile:
     CSVWriter = csv.writer(resultFile, delimiter='\t', quotechar='"', quoting=csv.QUOTE_MINIMAL)
     print("\nCollecting data...")
+    print('[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]')
     # mainloop
     while True:
         # get data
