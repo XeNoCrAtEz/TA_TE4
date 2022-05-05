@@ -91,7 +91,7 @@ class PIR:
         self.PIRlock = threading.Lock()
         self.PIRSamplingThread = threading.Thread(target=self.sample_PIR, daemon=True)
 
-        for pinNum in pin_PIR: GPIO.setup(pinNum, GPIO.IN)
+        for pinNum in pin_PIR: GPIO.setup(pinNum, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
         self.PIRSamplingThread.start()
 
@@ -194,3 +194,6 @@ class PIR:
                     if self.FOV != 360: return ((i-1 % n) + (i + 1)) * self.deltaTheta / 2 + startAngle
                     else: return ((i-1 % n) + (i + 1)) * self.deltaTheta / 2
         else: return None
+
+    def __del__(self):
+        GPIO.cleanup()
