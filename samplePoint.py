@@ -29,7 +29,7 @@ import sys
 
 
 # argument parsing
-pointNum = int(sys.argv[1])
+filename = sys.argv[1]
 updateTime = int(sys.argv[2])
 samplingTimeout = int(sys.argv[3])
 
@@ -57,7 +57,7 @@ else: raise RuntimeError("GPS sampling thread failed to run!")
 
 csvUpdateTime = time() + updateTime
 samplingTime = time() + samplingTimeout     # sample this point for 60 seconds
-csvFilename = 'detection_results/' + 'result' + str(pointNum) + '.csv'
+csvFilename = 'detection_results/' + 'result-' + filename + '.csv'
 with open(csvFilename, mode='w') as resultFile:
     CSVWriter = csv.writer(resultFile, delimiter='\t', quotechar='"', quoting=csv.QUOTE_MINIMAL)
     print("\nCollecting data...")
@@ -69,7 +69,13 @@ with open(csvFilename, mode='w') as resultFile:
         AoA = PIRsys.calc_AoA()
         lat, lng = GPSsys.get_lat_lng()
 
-        resultStr = '{}     AoA: {}\n'.format(detectionResult, AoA)
+        resultStr = "["
+        for value in detectionResult:
+            if value == 0:
+                resultStr += '{}, '.format(value)
+            else:
+                resultStr += '\u001b[31m{}\u001b[0m, '.format(value)
+        resultStr += '\b\b ]     AoA: {}\n'.format(AoA)
         resultStr += 'lat: {:.12f} lng: {:.12f}'.format(lat, lng)
         print(resultStr, end='\r\033[F')        # for re-printing resultStr at the same place
 
