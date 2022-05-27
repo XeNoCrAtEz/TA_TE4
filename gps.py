@@ -2,7 +2,8 @@ import serial
 import threading
 import pynmea2
 from time import sleep
-from dronekit import connect
+import dronekit
+import logging
 
 class GPS:
     """
@@ -58,7 +59,10 @@ class GPS:
         self.port = port
 
         if isUsingMAVLink:
-            self.UAV = connect(self.port, baud=230400, wait_ready=True, status_printer=lambda x: x)
+            self.UAV = dronekit.connect(self.port, baud=230400, wait_ready=True)
+            # mute logging
+            logging.getLogger('dronekit').addHandler(logging.NullHandler())
+            logging.getLogger('autopilot').addHandler(logging.NullHandler())
         else:
             self.ser = serial.Serial(self.port, baudrate=9600, timeout=0.5)
             
@@ -77,7 +81,7 @@ class GPS:
                 with self.GPSlock:
                     self.lat = self.UAV.location.global_relative_frame.lat
                     self.lng = self.UAV.location.global_relative_frame.lon
-                    sleep(1)
+                sleep(1)
         else:
             while True:
                 # get readline until "$GNRMC"
