@@ -3,7 +3,6 @@ import threading
 import pynmea2
 from time import sleep
 import dronekit
-import logging
 
 class GPS:
     """
@@ -60,9 +59,6 @@ class GPS:
 
         if isUsingMAVLink:
             self.UAV = dronekit.connect(self.port, baud=230400, wait_ready=True)
-            # mute logging
-            logging.getLogger('dronekit').addHandler(logging.NullHandler())
-            logging.getLogger('autopilot').addHandler(logging.NullHandler())
         else:
             self.ser = serial.Serial(self.port, baudrate=9600, timeout=0.5)
             
