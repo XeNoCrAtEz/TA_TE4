@@ -46,7 +46,7 @@ class GPS:
         ----------
         isUsingMAVLink : bool
             - Input True if GPS reading is gained from Flight Controller at the 
-              specified serial port (default, baudrate=57600).
+              specified serial port (default, baudrate=230400).
             - Input False if GPS module is directly connected to the specified serial port
         port : str
             Specifies the path to Serial port filestream
@@ -58,7 +58,7 @@ class GPS:
         self.port = port
 
         if isUsingMAVLink:
-            self.UAV = connect(self.port, baud=57600, wait_ready=True)
+            self.UAV = connect(self.port, baud=230400, wait_ready=True, status_printer=lambda x: x)
         else:
             self.ser = serial.Serial(self.port, baudrate=9600, timeout=0.5)
             
@@ -96,3 +96,9 @@ class GPS:
 
         with self.GPSlock:
             return [self.lat, self.lng]
+
+    def __del__(self):
+        try:
+            self.UAV.close()
+        except AttributeError:
+            self.ser.close()
