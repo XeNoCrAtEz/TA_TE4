@@ -162,3 +162,5 @@ cython_debug/
 *.csv
 *.http
 tes_files/
+
+*.json
