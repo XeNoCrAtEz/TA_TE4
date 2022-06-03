@@ -34,7 +34,15 @@ updateTime = int(sys.argv[2])
 samplingTimeout = int(sys.argv[3])
 
 
+print("Initialize GPS system...", end="")
+
+# GPS system object
+GPSsys = GPS(isUsingMAVLink=False)
+
+if GPSsys.GPSSamplingThread.is_alive(): print("\u001b[32mSuccess\u001b[0m")
+else: raise RuntimeError("GPS sampling thread failed to run!")
 print("Initialize PIR system...", end="")
+
 
 # PIR pin settings
 #      PIR 1  2  3  4   5   6   7   8   9   10
@@ -46,30 +54,27 @@ if PIRsys.PIRSamplingThread.is_alive(): print("\u001b[32mSuccess\u001b[0m")
 else: raise RuntimeError("PIR sampling thread failed to run!")
 
 
-print("Initialize GPS system...", end="")
-
-# GPS system object
-GPSsys = GPS(isUsingMAVLink=False)
-
-if GPSsys.GPSSamplingThread.is_alive(): print("\u001b[32mSuccess\u001b[0m")
-else: raise RuntimeError("GPS sampling thread failed to run!")
-
-
 csvUpdateTime = time() + updateTime
 samplingTime = time() + samplingTimeout     # sample this point for 60 seconds
 csvFilename = 'detection_results/' + 'result-' + filename + '.csv'
 with open(csvFilename, mode='w') as resultFile:
     CSVWriter = csv.writer(resultFile, delimiter='\t', quotechar='"', quoting=csv.QUOTE_MINIMAL)
     print("\nCollecting data...")
-    print('[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]')
     # mainloop
     while True:
         # get data
-        detectionResult = PIRsys.get_detection_result()
+        giliran, detectionResult = PIRsys.get_detection_result()
         AoA = PIRsys.calc_AoA()
         lat, lng = GPSsys.get_lat_lng()
 
         resultStr = "["
+        for num in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]:
+            if num == giliran+1:
+                resultStr += '\u001b[32m{}\u001b[0m, '.format(num)
+            else:
+                resultStr += '{}, '.format(num)
+        resultStr += '\b\b]\n'
+        resultStr += "["
         for value in detectionResult:
             if value == 0:
                 resultStr += '{}, '.format(value)
@@ -77,7 +82,7 @@ with open(csvFilename, mode='w') as resultFile:
                 resultStr += '\u001b[31m{}\u001b[0m, '.format(value)
         resultStr += '\b\b ]     AoA: {}\n'.format(AoA)
         resultStr += 'lat: {:.12f} lng: {:.12f}'.format(lat, lng)
-        print(resultStr, end='\r\033[F')        # for re-printing resultStr at the same place
+        print(resultStr, end='\r\033[F\r\033[F')        # for re-printing resultStr at the same place
         sleep(0.5)
         # write to csv file if something detected, update per second
         if time() > csvUpdateTime:
