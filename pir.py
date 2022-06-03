@@ -115,7 +115,7 @@ class PIR:
 
             sleep(delayPerGiliran)
 
-            self.giliran = (self.giliran+1) % 10
+            self.giliran = (self.giliran+1) % self.k
         
         
     def calc_V(self) -> np.ndarray:
