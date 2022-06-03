@@ -93,6 +93,7 @@ class PIR:
 
         for pinNum in pin_PIR: GPIO.setup(pinNum, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
+        self.giliran = 0
         self.PIRSamplingThread.start()
 
     def sample_PIR(self) -> None:
@@ -102,30 +103,20 @@ class PIR:
         to reduce noise / false triggers.
         """
 
-        detectionFreq = [0 for _ in self.pin_PIR]
-        sampledResult = [0 for _ in self.pin_PIR]
-        numSamples = 0
-        samplingFreq = self.samplingFreq   # Hz
-        samplingPeriod = 1/samplingFreq
-        updateEndTime = time() + self.updateTime
-        while True:
-            sampledResult = [GPIO.input(pinNum) for pinNum in self.pin_PIR]
-            numSamples += 1
-            for idx, result in enumerate(sampledResult):
-                detectionFreq[idx] += result
-            sleep(samplingPeriod)
-            
-            if time() > updateEndTime:
-                
-                with self.PIRlock:
-                    self.detectionResult = normalize_data(detectionFreq)
-                    self.m = np.transpose(np.array(self.detectionResult, dtype=bool))
-                    self.s = np.dot(np.linalg.inv(self.V), self.m).astype(bool)
+        delayPerGiliran = 1 # detik
 
-                # reset detection results
-                detectionFreq = [0 for _ in self.pin_PIR]
-                numSamples = 0
-                updateEndTime = time() + self.updateTime
+        while True:            
+            sampledResult = [GPIO.input(pinNum) for pinNum in self.pin_PIR]
+            
+            with self.PIRlock:
+                self.detectionResult = [result if pirNum == self.giliran else 0 for pirNum, result in enumerate(sampledResult)]
+                self.m = np.transpose(np.array(self.detectionResult, dtype=bool))
+                self.s = np.dot(np.linalg.inv(self.V), self.m).astype(bool)
+
+            sleep(delayPerGiliran)
+
+            self.giliran = (self.giliran+1) % 10
+        
         
     def calc_V(self) -> np.ndarray:
         """
@@ -143,7 +134,7 @@ class PIR:
         """
         
         with self.PIRlock:
-            return self.detectionResult
+            return self.giliran, self.detectionResult
 
     
     def get_output_pattern(self) -> np.ndarray:
