@@ -42,8 +42,10 @@ pin_PIR = (2, 3, 4, 17, 27, 22, 10, 24, 23, 18)
 # PIR system object
 PIRsys = PIR(pin_PIR, 10, 360, updateTime)
 
-if PIRsys.PIRSamplingThread.is_alive(): print("\u001b[32mSuccess\u001b[0m")
-else: raise RuntimeError("PIR sampling thread failed to run!")
+for thread in PIRsys.PIRSamplingThreads:
+    if thread.is_alive(): continue
+    else: raise RuntimeError("PIR sampling thread failed to run!")
+print("\u001b[32mSuccess\u001b[0m")
 
 
 print("Initialize GPS system...", end="")
