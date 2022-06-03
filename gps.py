@@ -68,6 +68,8 @@ class GPS:
         self.GPSSamplingThread = threading.Thread(target=self.sample_GPS, daemon=True)
         self.GPSSamplingThread.start()
 
+        sleep(2)    # let gps initialize
+
     def sample_GPS(self) -> None:
         """
         Get the GPS latitude and longitude data and update the result.
