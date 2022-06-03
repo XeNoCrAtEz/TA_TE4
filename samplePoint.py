@@ -49,7 +49,7 @@ else: raise RuntimeError("PIR sampling thread failed to run!")
 print("Initialize GPS system...", end="")
 
 # GPS system object
-GPSsys = GPS(isUsingMAVLink=True)
+GPSsys = GPS(isUsingMAVLink=False)
 
 if GPSsys.GPSSamplingThread.is_alive(): print("\u001b[32mSuccess\u001b[0m")
 else: raise RuntimeError("GPS sampling thread failed to run!")
@@ -78,10 +78,13 @@ with open(csvFilename, mode='w') as resultFile:
         resultStr += '\b\b ]     AoA: {}\n'.format(AoA)
         resultStr += 'lat: {:.12f} lng: {:.12f}'.format(lat, lng)
         print(resultStr, end='\r\033[F')        # for re-printing resultStr at the same place
-
+        sleep(0.5)
         # write to csv file if something detected, update per second
         if time() > csvUpdateTime:
-            if AoA is not None: CSVWriter.writerow([ctime(time()), detectionResult, lat, lng, AoA])
+            row = [ctime(time()),]
+            row.extend(detectionResult)
+            row.extend([lat,lng,AoA])
+            CSVWriter.writerow(row)
             csvUpdateTime = time() + 1
 
         if time() > samplingTime:
