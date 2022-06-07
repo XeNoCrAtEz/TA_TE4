@@ -38,7 +38,7 @@ print("Initialize PIR system...", end="")
 
 # PIR pin settings
 #      PIR 1  2  3  4   5   6   7   8   9   10
-pin_PIR = (2, 3, 4, 17, 27, 22, 10, 24, 23, 18)
+pin_PIR = (4, 17, 27, 22, 10, 11, 0, 24, 23, 18)
 # PIR system object
 PIRsys = PIR(pin_PIR, 10, 360, updateTime)
 
