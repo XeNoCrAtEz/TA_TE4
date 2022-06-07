@@ -90,37 +90,25 @@ class PIR:
         self.samplingFreq = samplingFreq
         self.PIRlock = threading.Lock()
         
-        self.PIRSamplingThreads = []
+        self.PIRSamplingThread = threading.Thread(target=self.sample_PIR, daemon=True)
 
-        for pinIdx, pinNum in enumerate(pin_PIR):
-            GPIO.setup(pinNum, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-            self.PIRSamplingThreads.append(threading.Thread(target=self.sample_PIR, args=(pinIdx,pinNum), daemon=True))
-            self.PIRSamplingThreads[-1].start()
+        for pinNum in pin_PIR: GPIO.setup(pinNum, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
-    def sample_PIR(self, pinIdx, pinNum) -> None:
+        self.PIRSamplingThread.start()
+
+
+    def sample_PIR(self) -> None:
         """
         Samples the PIR sensors at the specified sampling frequency and updates the
         result periodically. The sampling result is normalized using min-max normalization
         to reduce noise / false triggers.
         """
-
-        isDetected = False
+        
         while True:
-            pirOutput = GPIO.input(pinNum)
-            if isDetected == False:
-                if pirOutput == 0: continue
-                isDetected = True
-                with self.PIRlock:
-                    self.detectionResult[pinIdx] = pirOutput
-                    self.m = np.transpose(np.array(self.detectionResult, dtype=bool))
-                    self.s = np.dot(np.linalg.inv(self.V), self.m).astype(bool)
-            if isDetected == True:
-                if pirOutput == 1: continue
-                isDetected = False
-                with self.PIRlock:
-                    self.detectionResult[pinIdx] = pirOutput
-                    self.m = np.transpose(np.array(self.detectionResult, dtype=bool))
-                    self.s = np.dot(np.linalg.inv(self.V), self.m).astype(bool)
+            with self.PIRlock:
+                self.detectionResult = [GPIO.input(pinNum) for pinNum in self.pin_PIR]
+                self.m = np.transpose(np.array(self.detectionResult, dtype=bool))
+                self.s = np.dot(np.linalg.inv(self.V), self.m).astype(bool)
         
     def calc_V(self) -> np.ndarray:
         """
