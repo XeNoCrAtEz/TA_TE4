@@ -1,7 +1,7 @@
 import RPi.GPIO as GPIO
 import threading
 from time import time, sleep
-from functions import normalize_data
+from utils import normalize_data
 import numpy as np
 
 GPIO.setmode(GPIO.BCM)
@@ -89,43 +89,38 @@ class PIR:
         self.updateTime = updateTime
         self.samplingFreq = samplingFreq
         self.PIRlock = threading.Lock()
-        self.PIRSamplingThread = threading.Thread(target=self.sample_PIR, daemon=True)
+        
+        self.PIRSamplingThreads = []
 
-        for pinNum in pin_PIR: GPIO.setup(pinNum, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+        for pinIdx, pinNum in enumerate(pin_PIR):
+            GPIO.setup(pinNum, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+            self.PIRSamplingThreads.append(threading.Thread(target=self.sample_PIR, args=(pinIdx,pinNum), daemon=True))
+            self.PIRSamplingThreads[-1].start()
 
-        self.PIRSamplingThread.start()
-
-    def sample_PIR(self) -> None:
+    def sample_PIR(self, pinIdx, pinNum) -> None:
         """
         Samples the PIR sensors at the specified sampling frequency and updates the
         result periodically. The sampling result is normalized using min-max normalization
         to reduce noise / false triggers.
         """
 
-        detectionFreq = [0 for _ in self.pin_PIR]
-        sampledResult = [0 for _ in self.pin_PIR]
-        numSamples = 0
-        samplingFreq = self.samplingFreq   # Hz
-        samplingPeriod = 1/samplingFreq
-        updateEndTime = time() + self.updateTime
+        isDetected = False
         while True:
-            sampledResult = [GPIO.input(pinNum) for pinNum in self.pin_PIR]
-            numSamples += 1
-            for idx, result in enumerate(sampledResult):
-                detectionFreq[idx] += result
-            sleep(samplingPeriod)
-            
-            if time() > updateEndTime:
-                
+            pirOutput = GPIO.input(pinNum)
+            if isDetected == False:
+                if pirOutput == 0: continue
+                isDetected = True
                 with self.PIRlock:
-                    self.detectionResult = normalize_data(detectionFreq)
+                    self.detectionResult[pinIdx] = pirOutput
                     self.m = np.transpose(np.array(self.detectionResult, dtype=bool))
                     self.s = np.dot(np.linalg.inv(self.V), self.m).astype(bool)
-
-                # reset detection results
-                detectionFreq = [0 for _ in self.pin_PIR]
-                numSamples = 0
-                updateEndTime = time() + self.updateTime
+            if isDetected == True:
+                if pirOutput == 1: continue
+                isDetected = False
+                with self.PIRlock:
+                    self.detectionResult[pinIdx] = pirOutput
+                    self.m = np.transpose(np.array(self.detectionResult, dtype=bool))
+                    self.s = np.dot(np.linalg.inv(self.V), self.m).astype(bool)
         
     def calc_V(self) -> np.ndarray:
         """

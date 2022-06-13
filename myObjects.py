@@ -1,6 +1,6 @@
 import pygame
 import numpy as np
-from functions import *
+from utils import *
 
 class Point:
     def __init__(self, point: list, isScreenCoord: bool = True) -> None:
