@@ -7,7 +7,7 @@ Data will be uploaded to database.
 import subprocess
 import csv
 import datetime
-from functions import *
+from utils import *
 import requests
 
 for i in range(3):
