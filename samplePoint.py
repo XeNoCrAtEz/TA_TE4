@@ -49,7 +49,7 @@ print("\u001b[32mSuccess\u001b[0m")
 print("Initialize GPS system...", end="")
 
 # GPS system object
-GPSsys = GPS(isUsingMAVLink=False)
+GPSsys = GPS(isUsingMAVLink=True)
 
 if GPSsys.GPSSamplingThread.is_alive(): print("\u001b[32mSuccess\u001b[0m")
 else: raise RuntimeError("GPS sampling thread failed to run!")
