@@ -1,6 +1,5 @@
 """
 Run this module to sample PIR sensors at a point.
-
 NOTE
 ----
 if no GPS, use these command:
@@ -11,39 +10,6 @@ sudo systemctl disable serial-getty@ttyAMA0.service
 
 from time import time, ctime
 import csv
-from pir import *
-from gps import *
-from myObjects import *
-from functions import *
-import sys
-
-
-# argument parsing
-filename = sys.argv[1]
-updateTime = int(sys.argv[2])
-samplingTimeout = int(sys.argv[3])
-
-
-print("Initialize PIR system...", end="")
-
-# PIR pin settings
-#      PIR 1  2  3  4   5   6   7   8   9   10
-pin_PIR = (4, 17, 27, 22, 10, 11, 0, 24, 23, 18)
-# PIR system object
-PIRsys = PIR(pin_PIR, 10, 360, updateTime)
-
-if PIRsys.PIRSamplingThread.is_alive(): print("\u001b[32mSuccess\u001b[0m")
-else: raise RuntimeError("PIR sampling thread failed to run!")
-
-
-print("Initialize GPS system...", end="")
-
-# GPS system object
-GPSsys = GPS(isUsingMAVLink=False)
-
-if GPSsys.GPSSamplingThread.is_alive(): print("\u001b[32mSuccess\u001b[0m")
-else: raise RuntimeError("GPS sampling thread failed to run!")
-
 
 csvUpdateTime = time() + updateTime
 samplingTime = time() + samplingTimeout     # sample this point for 60 seconds
