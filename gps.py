@@ -58,7 +58,7 @@ class GPS:
         self.port = port
 
         if isUsingMAVLink:
-            self.UAV = dronekit.connect(self.port, baud=230400, wait_ready=True)
+            self.UAV = dronekit.connect(self.port, baud=230400, wait_ready=False)
         else:
             self.ser = serial.Serial(self.port, baudrate=9600, timeout=0.5)
             
