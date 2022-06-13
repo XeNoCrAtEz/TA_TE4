@@ -40,7 +40,7 @@ class GPS:
         returns the latest "lat, lng" received from the GPS
     """
 
-    def __init__(self, isUsingMAVLink: bool = True, port: str ="/dev/serial0") -> None:
+    def __init__(self, UAV:dronekit.Vehicle = None, port:str = "/dev/serial0") -> None:
         """
         Parameters
         ----------
@@ -53,13 +53,13 @@ class GPS:
             (default is Serial0 => "/dev/serial0")
         """
 
-        self.isUsingMAVLink = isUsingMAVLink
-
         self.port = port
 
-        if isUsingMAVLink:
-            self.UAV = dronekit.connect(self.port, baud=230400, wait_ready=False)
+        if UAV is not None:
+            self.isUsingMAVLink = True
+            self.UAV = UAV
         else:
+            self.isUsingMAVLink = False
             self.ser = serial.Serial(self.port, baudrate=9600, timeout=0.5)
             
         self.lat, self.lng = 0, 0
