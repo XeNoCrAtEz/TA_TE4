@@ -18,3 +18,36 @@ sudo systemctl restart serial-getty@ttyAMA0.service
 sudo systemctl stop serial-getty@ttyAMA0.service
 sudo systemctl disable serial-getty@ttyAMA0.service
 """
+import sys
+from pir import *
+from gps import *
+from utils import *
+
+# INITIALIZE REQUIRED VARIABLES
+# argument parsing
+filename = sys.argv[1]
+updateTime = int(sys.argv[2])
+samplingTimeout = int(sys.argv[3])
+
+print("\u001b[32mSuccess\u001b[0m")
+print("Initialize PIR system...", end="")
+
+# PIR pin settings
+#      PIR 1  2   3   4   5   6   7   8   9   10
+pin_PIR = (4, 17, 27, 22, 10, 11, 0, 24, 23, 18)
+# PIR system object
+PIRsys = PIR(pin_PIR, 10, 360, updateTime)
+
+for thread in PIRsys.PIRSamplingThreads:
+    if thread.is_alive(): continue
+    else: raise RuntimeError("PIR sampling thread failed to run!")
+print("\u001b[32mSuccess\u001b[0m")
+
+
+print("Initialize GPS system...", end="")
+
+# GPS system object
+GPSsys = GPS(isUsingMAVLink=True)
+
+if GPSsys.GPSSamplingThread.is_alive(): print("\u001b[32mSuccess\u001b[0m")
+else: raise RuntimeError("GPS sampling thread failed to run!")
