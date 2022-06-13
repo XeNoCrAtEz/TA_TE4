@@ -1,7 +1,5 @@
 import RPi.GPIO as GPIO
 import threading
-from time import time, sleep
-from utils import normalize_data
 import numpy as np
 
 GPIO.setmode(GPIO.BCM)
