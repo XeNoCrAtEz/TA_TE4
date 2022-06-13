@@ -223,3 +223,24 @@ def normalize_data(data: list) -> list:
         return [round((freq-min_data) / (max_data-min_data)) for freq in data]
     except ZeroDivisionError:
         return data
+
+
+def color_text(text:str, color:str) -> str:
+    if color == "black":
+        return f"\u001b[30m{text}\u001b[0m"
+    elif color == "red":
+        return f"\u001b[31m{text}\u001b[0m"
+    elif color == "green":
+        return f"\u001b[32m{text}\u001b[0m"
+    elif color == "yellow":
+        return f"\u001b[33m{text}\u001b[0m"
+    elif color == "blue":
+        return f"\u001b[34m{text}\u001b[0m"
+    elif color == "magenta":
+        return f"\u001b[35m{text}\u001b[0m"
+    elif color == "cyan":
+        return f"\u001b[36m{text}\u001b[0m"
+    elif color == "white":
+        return f"\u001b[37m{text}\u001b[0m"
+    else:
+        return f"{text}"
