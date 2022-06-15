@@ -87,7 +87,8 @@ class PIR:
         self.updateTime = updateTime
         self.samplingFreq = samplingFreq
         self.PIRlock = threading.Lock()
-        
+        self.stopThread = threading.Event()
+
         self.PIRSamplingThreads = []
 
         for pinIdx, pinNum in enumerate(pin_PIR):
@@ -104,6 +105,8 @@ class PIR:
 
         isDetected = False
         while True:
+            if self.stopThread.is_set():
+                break
             pirOutput = GPIO.input(pinNum)
             if isDetected == False:
                 if pirOutput == 0: continue
@@ -119,7 +122,7 @@ class PIR:
                     self.detectionResult[pinIdx] = pirOutput
                     self.m = np.transpose(np.array(self.detectionResult, dtype=bool))
                     self.s = np.dot(np.linalg.inv(self.V), self.m).astype(bool)
-        
+
     def calc_V(self) -> np.ndarray:
         """
         Returns the appropriate visibility matrix for the specified number of
@@ -189,4 +192,5 @@ class PIR:
         else: return None
 
     def __del__(self):
+        self.stopThread.set()
         GPIO.cleanup()

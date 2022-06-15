@@ -65,6 +65,7 @@ class GPS:
         self.lat, self.lng = 0, 0
 
         self.GPSlock = threading.Lock()
+        self.stopThread = threading.Event()
         self.GPSSamplingThread = threading.Thread(target=self.sample_GPS, daemon=True)
         self.GPSSamplingThread.start()
 
@@ -76,12 +77,16 @@ class GPS:
         """
         if self.isUsingMAVLink:
             while True:
+                if self.stopThread.is_set():
+                    break
                 with self.GPSlock:
                     self.lat = self.UAV.location.global_relative_frame.lat
                     self.lng = self.UAV.location.global_relative_frame.lon
                 sleep(1)
         else:
             while True:
+                if self.stopThread.is_set():
+                    break
                 # get readline until "$GNRMC"
                 newdata = str(self.ser.readline(), errors='ignore')
                 while newdata[0:6] != "$GNRMC":
