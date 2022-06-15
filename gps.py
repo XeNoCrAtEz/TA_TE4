@@ -105,6 +105,7 @@ class GPS:
             return [self.lat, self.lng]
 
     def __del__(self):
+        self.stopThread.set()
         try:
             self.UAV.close()
         except AttributeError:
