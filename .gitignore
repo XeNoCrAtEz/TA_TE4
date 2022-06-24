@@ -164,3 +164,8 @@ cython_debug/
 tes_files/
 
 *.json
+mav.parm
+mav.tlog
+mav.tlog.raw
+UAV/logs/2022-06-23/flight3/flight.tlog
+UAV/logs/2022-06-23/flight3/flight.tlog.raw
