@@ -17,6 +17,9 @@ if no GPS, use these command:
 sudo systemctl restart serial-getty@ttyAMA0.service
 sudo systemctl stop serial-getty@ttyAMA0.service
 sudo systemctl disable serial-getty@ttyAMA0.service
+
+Before running this script, please run mavproxy first using this command:
+mavproxy.py --master=/dev/serial0,912600 --out=udp:127.0.0.1:14550
 """
 import sys
 from time import sleep
