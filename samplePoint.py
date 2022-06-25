@@ -9,48 +9,56 @@ sudo systemctl disable serial-getty@ttyAMA0.service
 """
 
 from time import time, ctime, sleep
-import csv
 import os
 from pir import *
 from gps import *
-# from detectionData import *
+from detectionData import *
+import dronekit
 
-def samplePoint(filename:str, updateTime:int, samplingTimeout:int, PIRsys:PIR, GPSsys:GPS):
+DELAY_TIME = 0.5
+
+def samplePoint(
+        filename:str, resultdir:str,
+        updateTime:int, samplingTimeout:int,
+        PIRsys:PIR, GPSsys:GPS, UAV:dronekit.Vehicle
+    ):
     csvUpdateTime = time() + updateTime
-    samplingTime = time() + samplingTimeout     # sample this point for 60 seconds
-    resultdir = "detection_results"
+    samplingTime = time() + samplingTimeout
+    readingsRefreshTime = time() + DELAY_TIME
+    
     if not os.path.isdir(resultdir):
         os.mkdir(resultdir)
     csvFilename = os.path.join(resultdir, filename)
-    with open(csvFilename, mode='w') as resultFile:
-        CSVWriter = csv.writer(resultFile, delimiter='\t', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-        print("\nCollecting data...")
-        print('[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]')
-        # mainloop
-        while True:
-            # get data
+    detectionDataWriter = DetectionDataWriter(csvFilename)
+
+    print(
+        "\n"
+        "Collecting data..."
+        "[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]"
+    )
+    while True:
+        if time() > readingsRefreshTime:
             detectionResult = PIRsys.get_detection_result()
-            AoA = PIRsys.calc_AoA()
             lat, lng = GPSsys.get_lat_lng()
+            yaw = UAV.attitude.yaw
 
             resultStr = "["
             for value in detectionResult:
                 if value == 0:
-                    resultStr += '{}, '.format(value)
+                    resultStr += f'{value}, '
                 else:
-                    resultStr += '\u001b[31m{}\u001b[0m, '.format(value)
-            resultStr += '\b\b ]     AoA: {}\n'.format(AoA)
-            resultStr += 'lat: {:.12f} lng: {:.12f}'.format(lat, lng)
+                    resultStr += color_text(f"{value}, ", "red")
+            resultStr += '\b\b ]\n'
+            resultStr += f'lat: {lat:.12f} lng: {lng:.12f}'
             print(resultStr, end='\r\033[F')        # for re-printing resultStr at the same place
-            sleep(0.5)
-            # write to csv file if something detected, update per second
-            if time() > csvUpdateTime:
-                row = [ctime(time()),]
-                row.extend(detectionResult)
-                row.extend([lat,lng,AoA])
-                CSVWriter.writerow(row)
-                csvUpdateTime = time() + 1
+        
+        if time() > csvUpdateTime:
+            detectionDataWriter.add_new_data(
+                ctime(time()), detectionResult,
+                lat, lng, yaw
+            )
+            csvUpdateTime = time() + updateTime
 
-            if time() > samplingTime:
-                print("\n\n\n\u001b[32mData collection Done!\u001b[0m\n")
-                break
+        if time() > samplingTime:
+            print(color_text("\n\n\nData collection Done!\n"), "green")
+            break

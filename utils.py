@@ -244,3 +244,43 @@ def color_text(text:str, color:str) -> str:
         return f"\u001b[37m{text}\u001b[0m"
     else:
         return f"{text}"
+
+
+def calc_AoA(pirSums:list, pirNums:list) -> float:
+    """
+    Calculate AoA (in degree) for the given detection pattern s and fan-shaped cell
+    detection angle (in degree)
+    NOTE
+    -------
+    FOV of 360 has different cell numbering than <360. For 360, C1 starts from 0 deg
+    Returns
+    -------
+    float
+        AoA value of the given detection pattern
+    None
+        If the given detection pattern does not match any AoA value
+    """
+
+    FOV = 360
+    n = 10
+    deltaTheta = FOV/n
+    startAngle = (180 - FOV)/2
+    i = pirNums
+    if pirNums is int:
+        if FOV != 360: return (i + i + 1) * deltaTheta / 2 + startAngle
+        else: return (i + i + 1) * deltaTheta / 2
+    # ambil bagian tengah klo keduanya sama2 nol atau bernilai
+    if pirSums[0] != 0 and pirSums[2] != 0 or pirSums[0] == 0 and pirSums[2] == 0:
+        i = pirNums[0]
+        if FOV != 360: return (i + i + 1) * deltaTheta / 2 + startAngle
+        else: return (i + i + 1) * deltaTheta / 2
+    # cek bagian kiri
+    if pirSums[0] != 0 and pirSums[1] != 0:
+        i = pirNums[0]
+        if FOV != 360: return ((i-1 % n) + (i + 1)) * deltaTheta / 2 + startAngle
+        else: return ((i-1 % n) + (i + 1)) * deltaTheta / 2
+    # cek bagian kanan
+    if pirSums[1] != 0 and pirSums[2] != 0:
+        i = pirNums[1]
+        if FOV != 360: return ((i-1 % n) + (i + 1)) * deltaTheta / 2 + startAngle
+        else: return ((i-1 % n) + (i + 1)) * deltaTheta / 2

@@ -89,8 +89,9 @@ while not UAV.mode.name == 'LOITER':
 print(color_text("LOITER mode", "red"))
 
 # sample data
-print(f"Sampling data at point-{filename}...", end="")
-samplePoint(filename+".csv", updateTime, samplingTimeout, PIRsys, GPSsys)
+print(f"Sampling data for {filename}...", end="")
+resultdir = "detection_results"
+samplePoint(filename, resultdir, updateTime, samplingTimeout, PIRsys, GPSsys, UAV)
 
 print(color_text("Sampling Points Completed\n", "green"))
 
