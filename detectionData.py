@@ -1,6 +1,6 @@
 import csv
 from positioning import *
-from functions import *
+from utils import *
 
 class DetectionData:
     def __init__(self, filename, delimiter='\t') -> None:
