@@ -18,7 +18,7 @@ class GlobalCoord:
         return RelativeCoord(originGlobal, dEast, dNorth)
 
     def __str__(self) -> str:
-        return f"{[self.lat, self.lng]}"
+        return f"{[self.lng, self.lat]}"
 
 
 class RelativeCoord:

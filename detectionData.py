@@ -21,6 +21,8 @@ class DetectionDataReader(DetectionData):
 
         self.dataList = [row for row in self.dataFileReader]
 
+        self.time = self.dataList[0][0]
+
         rowCount = len(self.dataList)
         columnCount = len(self.dataList[0])
 
@@ -56,7 +58,10 @@ class DetectionDataReader(DetectionData):
         # TODO: PIR1 tdk pas berada di bagian kanan drone (agak ke atas dikit)
         #       Sebaiknya diganti kode kalkulasi AoA-nya, mungkin bs mskkan
         #       sudut referensi
-        self.AoA = calc_AoA(maxIdxValue, self.PIR) + self.yaw
+        try:
+            self.AoA = calc_AoA(maxIdxValue, self.PIR) + self.yaw
+        except TypeError:
+            self.AoA = None
 
     def __str__(self) -> str:
         returnString = (

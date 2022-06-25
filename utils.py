@@ -12,7 +12,6 @@ This module contains helper functions for the main python script:
 """
 
 import numpy as np
-from detectionData import *
 from positioning import *
 
 def to_screen_coord(
@@ -271,6 +270,7 @@ def calc_AoA(pirSums:list, pirNums:list) -> float:
     if pirNums is int:
         if FOV != 360: return (i + i + 1) * deltaTheta / 2 + startAngle
         else: return (i + i + 1) * deltaTheta / 2
+    if pirSums == [0, 0, 0]: return None
     # ambil bagian tengah klo keduanya sama2 nol atau bernilai
     if pirSums[0] != 0 and pirSums[2] != 0 or pirSums[0] == 0 and pirSums[2] == 0:
         i = pirNums[0]
@@ -288,14 +288,14 @@ def calc_AoA(pirSums:list, pirNums:list) -> float:
         else: return ((i-1 % n) + (i + 1)) * deltaTheta / 2
 
 
-def triangulate(originData:DetectionDataReader, listDetectionData:list, isRelCoord:bool = False):
+def triangulate(originData, listDetectionData:list, isRelCoord:bool = False):
     tmpA = []
     tmpb = []
     for data in listDetectionData:
         if isRelCoord:
             x_i, y_i = data.relativePos.x, data.relativePos.y
         else:
-            x_i, y_i = data.globalPos.x, data.globalPos.y
+            x_i, y_i = data.globalPos.lng, data.globalPos.lat
         a_i = to_rad(data.AoA)
         tan_a = np.tan(a_i)
         tmpA.append([-tan_a, 1])
@@ -325,4 +325,4 @@ def triangulate(originData:DetectionDataReader, listDetectionData:list, isRelCoo
     if isRelCoord:
         return RelativeCoord(originData.globalPos, targetPos[0], targetPos[1])
     else:
-        return GlobalCoord(targetPos[0], targetPos[1])
+        return GlobalCoord(targetPos[1], targetPos[0])
