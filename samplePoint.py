@@ -34,8 +34,8 @@ def samplePoint(
 
     print(
         "\n"
-        "Collecting data..."
-        "[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]"
+        "Collecting data...\n"
+        "[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\n"
     )
     while True:
         if time() > readingsRefreshTime:
@@ -48,8 +48,8 @@ def samplePoint(
                 if value == 0:
                     resultStr += f'{value}, '
                 else:
-                    resultStr += color_text(f"{value}, ", "red")
-            resultStr += '\b\b ]\n'
+                    resultStr += color_text(f"{value}", "red")+', '
+            resultStr += f'\b\b ]   yaw: {yaw}\n'
             resultStr += f'lat: {lat:.12f} lng: {lng:.12f}'
             print(resultStr, end='\r\033[F')        # for re-printing resultStr at the same place
         
@@ -61,5 +61,5 @@ def samplePoint(
             csvUpdateTime = time() + updateTime
 
         if time() > samplingTime:
-            print(color_text("\n\n\nData collection Done!\n"), "green")
+            print(color_text("\n\n\nData collection Done!\n", "green"))
             break
