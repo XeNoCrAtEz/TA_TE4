@@ -5,127 +5,22 @@ from utils import *
 import requests
 from detectionData import *
 
-# pirSums = {}
-# pirNums = {}
-# AoAs = {}
-# pointsPos = {
-#     # 1: (0, 0),
-#     # 2: (5, 0),
-#     # 3: (10, 0),
-#     # 4: (15, 0),
-#     # 5: (17.5, -4.3),
-#     # 6: (12.5, -4.3),
-#     # 7: (7.5, -4.3),
-#     # 8: (2.5, -4.3),
-#     # 9: (0, -8.6),
-#     # 10: (5, -8.6),
-#     # 11: (10, -8.6),
-#     # 12: (15, -8.6)
-# }
-
-# i = 1
-# with open(f'Point{i}_5m.csv') as dataFile:
-#     dataFileReader = csv.reader(dataFile, delimiter=',')
-#     pirSums[i] = [0 for _ in range(10)]
-#     pointsPos[i] = [0,0]
-#     line_count = 0
-#     # jumlahkan smua pendeteksian
-#     for row in dataFileReader:
-#         if float(row[11]) != 0.0: pointsPos[i][0] += float(row[11])
-#         if float(row[12]) != 0.0: pointsPos[i][1] += float(row[12])
-#         for j in range(len(pirSums[i])):
-#             pirSums[i][j] += int(row[j+1])
-#         line_count += 1
-#     pointsPos[i][0] /= line_count
-#     pointsPos[i][1] /= line_count
-    
-#     # cari nomor pir yg mendeteksi
-#     maxIdx = pirSums[i].index(max(pirSums[i]))
-#     pirNums[i] = [maxIdx-1, maxIdx, (maxIdx+1)%10]
-#     # hitung AoA
-#     maxIdxValue = [pirSums[i][pirNum] for pirNum in pirNums[i]]
-#     AoAs[i] = calc_AoA(maxIdxValue, pirNums[i])
-
-#     print(f"Titik{i}:")
-#     print(f"    PIRSums: {pirSums[i]}")
-#     print(f"    PIR:     {[pirNums[i][j]+1 for j in range(3)]}")
-#     print(f"    AoA:     {AoAs[i]}")
-#     print(f"    Posisi:  {pointsPos[i]}")
-
-# for i in range(4, 7):
-#     with open(f'Point{i}_5m.csv') as dataFile:
-#         dataFileReader = csv.reader(dataFile, delimiter=',')
-#         pirSums[i] = [0 for _ in range(10)]
-#         pointsPos[i] = [0,0]
-#         line_count = 0
-#         # jumlahkan smua pendeteksian
-#         for row in dataFileReader:
-#             if float(row[11]) != 0.0: pointsPos[i][0] += float(row[11])
-#             if float(row[12]) != 0.0: pointsPos[i][1] += float(row[12])
-#             for j in range(len(pirSums[i])):
-#                 pirSums[i][j] += int(row[j+1])
-#             line_count += 1
-#         pointsPos[i][0] /= line_count
-#         pointsPos[i][1] /= line_count
-#         pointsPos[i][0], pointsPos[i][1] = latlngToXY(
-#             pointsPos[1][0], pointsPos[1][1],
-#             pointsPos[i][0], pointsPos[i][1]
-#         )
-#         # cari nomor pir yg mendeteksi
-#         maxIdx = pirSums[i].index(max(pirSums[i]))
-#         pirNums[i] = [maxIdx-1, maxIdx, (maxIdx+1)%10]
-#         # hitung AoA
-#         maxIdxValue = [pirSums[i][pirNum] for pirNum in pirNums[i]]
-#         AoAs[i] = calc_AoA(maxIdxValue, pirNums[i])
-
-#         print(f"Titik{i}:")
-#         print(f"    PIRSums: {pirSums[i]}")
-#         print(f"    PIR:     {[pirNums[i][j]+1 for j in range(3)]}")
-#         print(f"    AoA:     {AoAs[i]}")
-#         print(f"    Posisi:  {pointsPos[i]}")
-
-originData = DetectionDataReader(f"Point1_5m.csv", ',')
+detectionData = [DetectionDataReader(f"detection_results/Point{i}_5m.csv", ',') for i in range(1, 13)]
+originData = detectionData[0]
 originData.relativePos = originData.globalPos.to_relative(originData.globalPos)
 print(originData)
-detectionData = [DetectionDataReader(f"Point{i}_5m.csv", ',') for i in range(8, 11)]
 for data in detectionData:
     data.relativePos = data.globalPos.to_relative(originData.globalPos)
     print(data)
 
-tmpA = []
-tmpb = []
-for data in detectionData:
-    x_i, y_i = data.relativePos.x, data.relativePos.y
-    a_i = to_rad(data.AoA)
-    tan_a = np.tan(a_i)
-    tmpA.append([-tan_a, 1])
-    tmpb.append([y_i - x_i*tan_a])
-A = np.array(tmpA)
-# A = np.array(
-#     [[-tan(a1), 1],
-#      [-tan(a2), 1],
-#      [-tan(a3), 1]]
-# )
-b = np.array(tmpb)
-# b = np.array(
-#     [[y1-x1*tan(a1)],
-#      [y2-x2*tan(a2)],
-#      [y3-x3*tan(a3)]]
-# )
+isRelCoord = False
+listPosKorban = [
+    triangulate(originData, detectionData[4:7], isRelCoord),
+    triangulate(originData, detectionData[8:11], isRelCoord)
+]
 
-print("")
-print(f"A:")
-print(f"{A}")
-print(f"b:")
-print(f"{b}")
-
-# c = ( (A' * A)^-1 * A' * b )'
-targetPos = np.transpose(np.linalg.inv(np.transpose(A).dot(A)).dot(np.transpose(A)).dot(b) ).tolist()[0]
-
-# realTargetPos = (15, -1.5)
-print("")
-# print(f"Real Target Pos =       {realTargetPos}")
-print(f"Calculated Target Pos = {RelativeCoord(originData.globalPos, targetPos[0], targetPos[1]).to_global()}")
+for posKorban in listPosKorban:
+    print(posKorban)
 
 # error = np.sqrt((realTargetPos[0]-targetPos[0])**2 + (realTargetPos[1]-targetPos[1])**2)
 print("")

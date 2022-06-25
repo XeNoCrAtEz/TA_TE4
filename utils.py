@@ -12,6 +12,8 @@ This module contains helper functions for the main python script:
 """
 
 import numpy as np
+from detectionData import *
+from positioning import *
 
 def to_screen_coord(
         cartPoint: tuple,
@@ -284,3 +286,43 @@ def calc_AoA(pirSums:list, pirNums:list) -> float:
         i = pirNums[1]
         if FOV != 360: return ((i-1 % n) + (i + 1)) * deltaTheta / 2 + startAngle
         else: return ((i-1 % n) + (i + 1)) * deltaTheta / 2
+
+
+def triangulate(originData:DetectionDataReader, listDetectionData:list, isRelCoord:bool = False):
+    tmpA = []
+    tmpb = []
+    for data in listDetectionData:
+        if isRelCoord:
+            x_i, y_i = data.relativePos.x, data.relativePos.y
+        else:
+            x_i, y_i = data.globalPos.x, data.globalPos.y
+        a_i = to_rad(data.AoA)
+        tan_a = np.tan(a_i)
+        tmpA.append([-tan_a, 1])
+        tmpb.append([y_i - x_i*tan_a])
+    A = np.array(tmpA)
+    # A = np.array(
+    #     [[-tan(a1), 1],
+    #      [-tan(a2), 1],
+    #      [-tan(a3), 1]]
+    # )
+    b = np.array(tmpb)
+    # b = np.array(
+    #     [[y1-x1*tan(a1)],
+    #      [y2-x2*tan(a2)],
+    #      [y3-x3*tan(a3)]]
+    # )
+
+    print("")
+    print(f"A:")
+    print(f"{A}")
+    print(f"b:")
+    print(f"{b}")
+
+    # c = ( (A' * A)^-1 * A' * b )'
+    targetPos = np.transpose(np.linalg.inv(np.transpose(A).dot(A)).dot(np.transpose(A)).dot(b)).tolist()[0]
+
+    if isRelCoord:
+        return RelativeCoord(originData.globalPos, targetPos[0], targetPos[1])
+    else:
+        return GlobalCoord(targetPos[0], targetPos[1])
