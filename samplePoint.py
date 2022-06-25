@@ -8,10 +8,11 @@ sudo systemctl stop serial-getty@ttyAMA0.service
 sudo systemctl disable serial-getty@ttyAMA0.service
 """
 
-from time import time, ctime, sleep
+from time import time, ctime
 import os
 from pir import *
 from gps import *
+from utils import *
 from detectionData import *
 import dronekit
 
