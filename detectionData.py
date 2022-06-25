@@ -20,37 +20,60 @@ class DetectionDataReader(DetectionData):
         self.dataFileReader = csv.reader(self.dataFile, delimiter=delimiter)
 
         self.dataList = [row for row in self.dataFileReader]
-        pirDataRange = range(1, len(self.dataList[0])-2)    # data PIR ada di kolom 1 smpe 3 kolom terakhir
-        self.pirSums = {i:0 for i in pirDataRange}          # menggunakan dict agar bs PIR-'1' mendeteksi brp kali?
+
+        rowCount = len(self.dataList)
+        columnCount = len(self.dataList[0])
+
+        PIRDataRange = range(1, columnCount-3)              # data PIR ada di kolom 1 smpe 3 kolom terakhir
+        self.PIRSums = {i:0 for i in PIRDataRange}          # menggunakan dict agar bs PIR-'1' mendeteksi brp kali?
+        
         self.globalPos = [0, 0]
+        self.yaw = 0
         for row in self.dataList:
             # parse data sesuai dgn format aslinya
-            for i in pirDataRange: row[i] = int(row[i])
-            row[-2] = float(row[-2])        # lat
-            row[-1] = float(row[-1])        # lng
+            for i in PIRDataRange: row[i] = int(row[i])
+            row[-3] = float(row[-3])        # lat: float
+            row[-2] = float(row[-2])        # lng: float
+            row[-1] = float(row[-1])        # yaw: float
 
-            for i in pirDataRange:
-                self.pirSums[i] += row[i]
-            self.globalPos = [self.globalPos[0]+row[-2], self.globalPos[1]+row[-1]]
-        self.globalPos = [self.globalPos[0]/len(self.dataList), self.globalPos[1]/len(self.dataList)]
+            for i in PIRDataRange: self.PIRSums[i] += row[i]
+            self.globalPos = [self.globalPos[0]+row[-3], self.globalPos[1]+row[-2]]
+            
+            self.yaw += row[-1]
+        
+        self.globalPos = [self.globalPos[0]/rowCount, self.globalPos[1]/rowCount]
         self.globalPos = GlobalCoord(self.globalPos[0], self.globalPos[1])
         
+        self.yaw /= rowCount
+        
         # cari nomor pir yg mendeteksi
-        maxIdx = max(self.pirSums, key=self.pirSums.get)
-        self.PIR = [idx%10 if idx%10 != 0 else 10 for idx in range(maxIdx-1, maxIdx+2)]
+        maxIdx = max(self.PIRSums, key=self.PIRSums.get)
+        PIRcount = columnCount-4
+        self.PIR = [idx%PIRcount if idx%PIRcount != 0 else PIRcount for idx in range(maxIdx-1, maxIdx+2)]
+        
         # hitung AoA
-        maxIdxValue = [self.pirSums[pirNum] for pirNum in self.PIR]
-        self.AoA = calc_AoA(maxIdxValue, self.PIR) + 90
+        maxIdxValue = [self.PIRSums[PIRNum] for PIRNum in self.PIR]
+        # TODO: PIR1 tdk pas berada di bagian kanan drone (agak ke atas dikit)
+        #       Sebaiknya diganti kode kalkulasi AoA-nya, mungkin bs mskkan
+        #       sudut referensi
+        self.AoA = calc_AoA(maxIdxValue, self.PIR) + self.yaw
 
     def __str__(self) -> str:
-        return (
+        returnString = (
             f"{self.filename}:\n"
-            f"    PIRSums:    {[self.pirSums[k] for k in self.pirSums]}\n"
+            f"    PIRSums:    {[self.PIRSums[k] for k in self.PIRSums]}\n"
             f"    PIR:        {self.PIR}\n"
             f"    AoA:        {self.AoA}\n"
             f"    GlobalPos:  {self.globalPos}\n"
-            f"    RelPos:     {self.relativePos}\n"
         )
+        try:
+            return returnString + (
+                f"    RelPos:     {self.relativePos}\n"
+            )
+        except AttributeError:
+            return returnString + (
+                f"    RelPos:     None\n"
+            )
 
 
 class DetectionDataWriter(DetectionData):
@@ -61,6 +84,6 @@ class DetectionDataWriter(DetectionData):
 
         self.dataFileWriter = csv.writer(self.dataFile, delimiter=delimiter)
         
-    def add_new_data(self, date, detectionResult, lat, lng):
-        newdata = [date, detectionResult, lat, lng]
+    def add_new_data(self, date:str, detectionResult:list, lat:float, lng:float, yaw:float):
+        newdata = [date,] + detectionResult + [lat, lng, yaw]
         self.dataFileWriter.writerow(newdata)
