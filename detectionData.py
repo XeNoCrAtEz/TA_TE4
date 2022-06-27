@@ -55,11 +55,8 @@ class DetectionDataReader(DetectionData):
         
         # hitung AoA
         maxIdxValue = [self.PIRSums[PIRNum] for PIRNum in self.PIR]
-        # TODO: PIR1 tdk pas berada di bagian kanan drone (agak ke atas dikit)
-        #       Sebaiknya diganti kode kalkulasi AoA-nya, mungkin bs mskkan
-        #       sudut referensi
         try:
-            self.AoA = calc_AoA(maxIdxValue, self.PIR) + self.yaw
+            self.AoA = calc_AoA(maxIdxValue, self.PIR) + to_deg(self.yaw)
         except TypeError:
             self.AoA = None
 
