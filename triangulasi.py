@@ -2,17 +2,23 @@ import requests
 from utils import *
 from detectionData import *
 
-detectionData = [DetectionDataReader(f"detection_results/Point{i}_5m.csv", ',') for i in range(1, 13)]
+detectionData = [DetectionDataReader(f"detection_results/Point{i}_8m.csv", ',') for i in range(1, 10)]
 originData = detectionData[0]
 for data in detectionData:
     data.relativePos = data.globalPos.to_relative(originData.globalPos)
     print(data)
 
-isRelCoord = False
-listPosKorban = [
-    triangulate(originData, detectionData[3:6], isRelCoord),
-    triangulate(originData, detectionData[7:10], isRelCoord)
-]
+isRelCoord = True
+if isRelCoord:
+    listPosKorban = [
+        triangulate(originData, detectionData[2:5], isRelCoord).to_global(),
+        triangulate(originData, detectionData[5:8], isRelCoord).to_global()
+    ]
+else:
+    listPosKorban = [
+        triangulate(originData, detectionData[2:5], isRelCoord),
+        triangulate(originData, detectionData[5:8], isRelCoord)
+    ]
 
 print("")
 for posKorban in listPosKorban:
