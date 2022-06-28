@@ -71,22 +71,22 @@ print(color_text("System Initialization Completed\n", "green"))
 # SAMPLE AT EACH POINT
 print(color_text(f"Sampling Data for {filename}...\n", "green"))
 # tunggu hingga drone di arm
-print("Waiting for UAV to be armed...", end="")
-while not UAV.armed:
-    sleep(0.5)
-print(color_text("Armed", "red"))
+# print("Waiting for UAV to be armed...", end="")
+# while not UAV.armed:
+#     sleep(0.5)
+# print(color_text("Armed", "red"))
 
-# # tunggu hingga drone dlm mode auto
-# print("Waiting for UAV to be in AUTO mode...", end="")
-# while UAV.mode.name != "AUTO":
-#     sleep(1)
-# print(color_text("AUTO mode", "red"))
+# # # tunggu hingga drone dlm mode auto
+# # print("Waiting for UAV to be in AUTO mode...", end="")
+# # while UAV.mode.name != "AUTO":
+# #     sleep(1)
+# # print(color_text("AUTO mode", "red"))
 
-# tunggu hingga drone dlm mode loiter (pendeteksian dimulai)
-print("Waiting for UAV to be in LOITER mode...", end="")
-while not UAV.mode.name == 'LOITER':
-    sleep(0.5)
-print(color_text("LOITER mode", "red"))
+# # tunggu hingga drone dlm mode loiter (pendeteksian dimulai)
+# print("Waiting for UAV to be in LOITER mode...", end="")
+# while not UAV.mode.name == 'LOITER':
+#     sleep(0.5)
+# print(color_text("LOITER mode", "red"))
 
 # sample data
 print(f"Sampling data for {filename}...", end="")
